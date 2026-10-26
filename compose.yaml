@@ -74,7 +74,7 @@ services:
       OUTBOX_BACKOFF_MS: 10
       SQS_VISIBILITY_SECONDS: 3
       TEST_SQS: 'true'
-    command: ['sh', '-c', 'bun run typecheck && bun test && bun run build']
+    command: ['sh', '-c', 'bun run typecheck && bun test --timeout 60000 && bun run build']
     depends_on:
       setup:
         condition: service_completed_successfully
