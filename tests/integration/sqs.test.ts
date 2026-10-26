@@ -30,11 +30,15 @@ const envelope = (input: ReturnType<typeof wager>, id = randomUUID()) => ({
 describe.skipIf(!enabled)('SQS compatível via emulador', () => {
   beforeAll(async () => {
     await initialize();
-    const setup = Bun.spawn([process.execPath, 'scripts/queues.ts'], {
-      stdout: 'ignore',
-      stderr: 'pipe',
-    });
-    expect(await setup.exited).toBe(0);
+    try {
+      await queues.ready();
+    } catch {
+      const setup = Bun.spawn([process.execPath, 'scripts/queues.ts'], {
+        stdout: 'ignore',
+        stderr: 'inherit',
+      });
+      expect(await setup.exited).toBe(0);
+    }
     // Executar somente no ambiente de teste dedicado: estas filas não são de produção.
     for (const name of [config.queue, config.dlq, config.events])
       await queues.client.send(new PurgeQueueCommand({ QueueUrl: await queues.url(name) }));
