@@ -1,0 +1,44 @@
+@base = http://localhost:3000
+@playerId = 0192f28f-5dc0-7d58-bdb2-814ad6a0f4a1
+@walletId = SUBSTITUA_PELO_ID_RETORNADO
+
+### Liveness
+GET {{base}}/health/live
+
+### Readiness
+GET {{base}}/health/ready
+
+### Abertura
+POST {{base}}/wallets
+Content-Type: application/json
+
+{"playerId":"{{playerId}}","initialBalance":{"amount":"100.00","currency":"BRL"}}
+
+### Aposta (repetir esta requisição testa idempotência)
+POST {{base}}/wagering/transactions
+Content-Type: application/json
+Idempotency-Key: provider-a:bet-1
+
+{"providerId":"provider-a","externalTransactionId":"bet-1","playerId":"{{playerId}}","walletId":"{{walletId}}","roundId":"round-1","gameId":"game-1","kind":"BET","money":{"amount":"25.00","currency":"BRL"}}
+
+### Reembolso
+POST {{base}}/wagering/transactions
+Content-Type: application/json
+Idempotency-Key: provider-a:refund-1
+
+{"providerId":"provider-a","externalTransactionId":"refund-1","playerId":"{{playerId}}","walletId":"{{walletId}}","roundId":"round-1","gameId":"game-1","kind":"REFUND","money":{"amount":"25.00","currency":"BRL"},"referenceExternalTransactionId":"bet-1"}
+
+### Consulta externa
+GET {{base}}/providers/provider-a/wagering/transactions/bet-1
+
+### Carteira
+GET {{base}}/wallets/{{walletId}}
+
+### Ledger
+GET {{base}}/wallets/{{walletId}}/ledger?limit=50
+
+### Reconciliação
+POST {{base}}/wallets/{{walletId}}/reconciliation
+
+### Métricas
+GET {{base}}/metrics

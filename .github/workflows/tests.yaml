@@ -1,0 +1,16 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run unit, database, SQS and multiprocess tests
+        run: docker compose --profile test run --build --rm tests
+      - name: Container logs
+        if: always()
+        run: docker compose logs --no-color
+      - name: Stop test environment
+        if: always()
+        run: docker compose down -v
