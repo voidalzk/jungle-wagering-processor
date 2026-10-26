@@ -33,14 +33,8 @@ Os testes de sistema iniciaram três processos da API e verificaram envio concor
 
 Os seis testes SQS executados com o emulador Java verificaram redelivery, inbox, DLQ, retry transitório, dois publishers sobre a outbox, queda após commit antes do ack e queda após envio antes de marcar a outbox. O emulador usa um protocolo compatível, mas não equivale a executar os mesmos testes com LocalStack em containers.
 
-## O que ainda precisa de validação no ambiente do avaliador
+## Validação em containers
 
-Execute a suite em Docker com LocalStack antes de declarar a integração exigida pelo desafio totalmente verificada:
+O workflow `.github/workflows/tests.yaml` executou a suite em um runner Linux com PostgreSQL e LocalStack em containers. A [execução de 26/10/2026](https://github.com/voidalzk/jungle-wagering-processor/actions/runs/40420503215) passou com TypeScript estrito, build e 49 testes aprovados, sem falhas. Isso valida a integração em containers, embora o Docker não tenha iniciado neste computador Windows.
 
-```sh
-docker compose --profile test run --build --rm tests
-```
-
-O workflow `.github/workflows/tests.yaml` faz essa execução em um runner Linux com Docker. Seu resultado será independente desta validação local.
-
-Também não foi realizado teste de carga nem benchmark de throughput. Não há números de desempenho alegados nesta entrega.
+Não foi realizado teste de carga nem benchmark de throughput. Não há números de desempenho alegados nesta entrega.
